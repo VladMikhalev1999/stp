@@ -1,0 +1,304 @@
+
+CREATE TABLE СТП_Билеты
+(
+	Номер                INTEGER NOT NULL ,
+	Ряд                  INTEGER NULL ,
+	Место                INTEGER NULL ,
+	Дата_и_время_сеанса  DATE NULL 
+);
+
+
+
+CREATE UNIQUE INDEX XPKСТП_Билеты ON СТП_Билеты
+(Номер   ASC);
+
+
+
+ALTER TABLE СТП_Билеты
+	ADD CONSTRAINT  XPKСТП_Билеты PRIMARY KEY (Номер);
+
+
+
+CREATE TABLE СТП_Сеансы
+(
+	Дата_и_время_сеанса  DATE NOT NULL ,
+	ИД_фильма            INTEGER NOT NULL ,
+	Цена                 INTEGER NULL 
+);
+
+
+
+CREATE UNIQUE INDEX XPKСТП_Сеансы ON СТП_Сеансы
+(Дата_и_время_сеанса   ASC);
+
+
+
+ALTER TABLE СТП_Сеансы
+	ADD CONSTRAINT  XPKСТП_Сеансы PRIMARY KEY (Дата_и_время_сеанса);
+
+
+
+CREATE TABLE СТП_Фильмы
+(
+	ИД                   INTEGER NOT NULL ,
+	Название             VARCHAR2(20) NULL 
+);
+
+
+
+CREATE UNIQUE INDEX XPKСТП_Фильмы ON СТП_Фильмы
+(ИД   ASC);
+
+
+
+ALTER TABLE СТП_Фильмы
+	ADD CONSTRAINT  XPKСТП_Фильмы PRIMARY KEY (ИД);
+
+
+
+ALTER TABLE СТП_Билеты
+	ADD (CONSTRAINT R_2 FOREIGN KEY (Дата_и_время_сеанса) REFERENCES СТП_Сеансы (Дата_и_время_сеанса) ON DELETE SET NULL);
+
+
+
+ALTER TABLE СТП_Сеансы
+	ADD (CONSTRAINT R_1 FOREIGN KEY (ИД_фильма) REFERENCES СТП_Фильмы (ИД));
+
+
+
+CREATE  TRIGGER tI_СТП_Билеты BEFORE INSERT ON СТП_Билеты for each row
+-- ERwin Builtin Trigger
+-- INSERT trigger on СТП_Билеты 
+DECLARE NUMROWS INTEGER;
+BEGIN
+    /* ERwin Builtin Trigger */
+    /* СТП_Сеансы  СТП_Билеты on child insert set null */
+    /* ERWIN_RELATION:CHECKSUM="0000ff73", PARENT_OWNER="", PARENT_TABLE="СТП_Сеансы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Билеты"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_2", FK_COLUMNS="Дата_и_время_сеанса" */
+    UPDATE СТП_Билеты
+      SET
+        /* %SetFK(СТП_Билеты,NULL) */
+        СТП_Билеты.Дата_и_время_сеанса = NULL
+      WHERE
+        NOT EXISTS (
+          SELECT * FROM СТП_Сеансы
+            WHERE
+              /* %JoinFKPK(:%New,СТП_Сеансы," = "," AND") */
+              :new.Дата_и_время_сеанса = СТП_Сеансы.Дата_и_время_сеанса
+        ) 
+        /* %JoinPKPK(СТП_Билеты,:%New," = "," AND") */
+         and СТП_Билеты.Номер = :new.Номер;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+CREATE  TRIGGER tU_СТП_Билеты AFTER UPDATE ON СТП_Билеты for each row
+-- ERwin Builtin Trigger
+-- UPDATE trigger on СТП_Билеты 
+DECLARE NUMROWS INTEGER;
+BEGIN
+  /* ERwin Builtin Trigger */
+  /* СТП_Сеансы  СТП_Билеты on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00010d7c", PARENT_OWNER="", PARENT_TABLE="СТП_Сеансы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Билеты"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_2", FK_COLUMNS="Дата_и_время_сеанса" */
+  SELECT count(*) INTO NUMROWS
+    FROM СТП_Сеансы
+    WHERE
+      /* %JoinFKPK(:%New,СТП_Сеансы," = "," AND") */
+      :new.Дата_и_время_сеанса = СТП_Сеансы.Дата_и_время_сеанса;
+  IF (
+    /* %NotnullFK(:%New," IS NOT NULL AND") */
+    :new.Дата_и_время_сеанса IS NOT NULL AND
+    NUMROWS = 0
+  )
+  THEN
+    raise_application_error(
+      -20007,
+      'Cannot update СТП_Билеты because СТП_Сеансы does not exist.'
+    );
+  END IF;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+
+CREATE  TRIGGER tI_СТП_Сеансы BEFORE INSERT ON СТП_Сеансы for each row
+-- ERwin Builtin Trigger
+-- INSERT trigger on СТП_Сеансы 
+DECLARE NUMROWS INTEGER;
+BEGIN
+    /* ERwin Builtin Trigger */
+    /* СТП_Фильмы  СТП_Сеансы on child insert restrict */
+    /* ERWIN_RELATION:CHECKSUM="0000e57e", PARENT_OWNER="", PARENT_TABLE="СТП_Фильмы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Сеансы"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_1", FK_COLUMNS="ИД_фильма" */
+    SELECT count(*) INTO NUMROWS
+      FROM СТП_Фильмы
+      WHERE
+        /* %JoinFKPK(:%New,СТП_Фильмы," = "," AND") */
+        :new.ИД_фильма = СТП_Фильмы.ИД;
+    IF (
+      /* %NotnullFK(:%New," IS NOT NULL AND") */
+      
+      NUMROWS = 0
+    )
+    THEN
+      raise_application_error(
+        -20002,
+        'Cannot insert СТП_Сеансы because СТП_Фильмы does not exist.'
+      );
+    END IF;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+CREATE  TRIGGER  tD_СТП_Сеансы AFTER DELETE ON СТП_Сеансы for each row
+-- ERwin Builtin Trigger
+-- DELETE trigger on СТП_Сеансы 
+DECLARE NUMROWS INTEGER;
+BEGIN
+    /* ERwin Builtin Trigger */
+    /* СТП_Сеансы  СТП_Билеты on parent delete set null */
+    /* ERWIN_RELATION:CHECKSUM="0000cc1e", PARENT_OWNER="", PARENT_TABLE="СТП_Сеансы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Билеты"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_2", FK_COLUMNS="Дата_и_время_сеанса" */
+    UPDATE СТП_Билеты
+      SET
+        /* %SetFK(СТП_Билеты,NULL) */
+        СТП_Билеты.Дата_и_время_сеанса = NULL
+      WHERE
+        /* %JoinFKPK(СТП_Билеты,:%Old," = "," AND") */
+        СТП_Билеты.Дата_и_время_сеанса = :old.Дата_и_время_сеанса;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+CREATE  TRIGGER tU_СТП_Сеансы AFTER UPDATE ON СТП_Сеансы for each row
+-- ERwin Builtin Trigger
+-- UPDATE trigger on СТП_Сеансы 
+DECLARE NUMROWS INTEGER;
+BEGIN
+  /* СТП_Сеансы  СТП_Билеты on parent update set null */
+  /* ERWIN_RELATION:CHECKSUM="0001fb92", PARENT_OWNER="", PARENT_TABLE="СТП_Сеансы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Билеты"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_2", FK_COLUMNS="Дата_и_время_сеанса" */
+  IF
+    /* %JoinPKPK(:%Old,:%New," <> "," OR ") */
+    :old.Дата_и_время_сеанса <> :new.Дата_и_время_сеанса
+  THEN
+    UPDATE СТП_Билеты
+      SET
+        /* %SetFK(СТП_Билеты,NULL) */
+        СТП_Билеты.Дата_и_время_сеанса = NULL
+      WHERE
+        /* %JoinFKPK(СТП_Билеты,:%Old," = ",",") */
+        СТП_Билеты.Дата_и_время_сеанса = :old.Дата_и_время_сеанса;
+  END IF;
+
+  /* ERwin Builtin Trigger */
+  /* СТП_Фильмы  СТП_Сеансы on child update restrict */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="", PARENT_TABLE="СТП_Фильмы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Сеансы"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_1", FK_COLUMNS="ИД_фильма" */
+  SELECT count(*) INTO NUMROWS
+    FROM СТП_Фильмы
+    WHERE
+      /* %JoinFKPK(:%New,СТП_Фильмы," = "," AND") */
+      :new.ИД_фильма = СТП_Фильмы.ИД;
+  IF (
+    /* %NotnullFK(:%New," IS NOT NULL AND") */
+    
+    NUMROWS = 0
+  )
+  THEN
+    raise_application_error(
+      -20007,
+      'Cannot update СТП_Сеансы because СТП_Фильмы does not exist.'
+    );
+  END IF;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+
+CREATE  TRIGGER  tD_СТП_Фильмы AFTER DELETE ON СТП_Фильмы for each row
+-- ERwin Builtin Trigger
+-- DELETE trigger on СТП_Фильмы 
+DECLARE NUMROWS INTEGER;
+BEGIN
+    /* ERwin Builtin Trigger */
+    /* СТП_Фильмы  СТП_Сеансы on parent delete restrict */
+    /* ERWIN_RELATION:CHECKSUM="0000d94e", PARENT_OWNER="", PARENT_TABLE="СТП_Фильмы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Сеансы"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_1", FK_COLUMNS="ИД_фильма" */
+    SELECT count(*) INTO NUMROWS
+      FROM СТП_Сеансы
+      WHERE
+        /*  %JoinFKPK(СТП_Сеансы,:%Old," = "," AND") */
+        СТП_Сеансы.ИД_фильма = :old.ИД;
+    IF (NUMROWS > 0)
+    THEN
+      raise_application_error(
+        -20001,
+        'Cannot delete СТП_Фильмы because СТП_Сеансы exists.'
+      );
+    END IF;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
+CREATE  TRIGGER tU_СТП_Фильмы AFTER UPDATE ON СТП_Фильмы for each row
+-- ERwin Builtin Trigger
+-- UPDATE trigger on СТП_Фильмы 
+DECLARE NUMROWS INTEGER;
+BEGIN
+  /* ERwin Builtin Trigger */
+  /* СТП_Фильмы  СТП_Сеансы on parent update restrict */
+  /* ERWIN_RELATION:CHECKSUM="0000f24f", PARENT_OWNER="", PARENT_TABLE="СТП_Фильмы"
+    CHILD_OWNER="", CHILD_TABLE="СТП_Сеансы"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_1", FK_COLUMNS="ИД_фильма" */
+  IF
+    /* %JoinPKPK(:%Old,:%New," <> "," OR ") */
+    :old.ИД <> :new.ИД
+  THEN
+    SELECT count(*) INTO NUMROWS
+      FROM СТП_Сеансы
+      WHERE
+        /*  %JoinFKPK(СТП_Сеансы,:%Old," = "," AND") */
+        СТП_Сеансы.ИД_фильма = :old.ИД;
+    IF (NUMROWS > 0)
+    THEN 
+      raise_application_error(
+        -20005,
+        'Cannot update СТП_Фильмы because СТП_Сеансы exists.'
+      );
+    END IF;
+  END IF;
+
+
+-- ERwin Builtin Trigger
+END;
+/
+
