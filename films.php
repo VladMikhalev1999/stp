@@ -8,9 +8,10 @@
     </head>
     
 <?php
-    $db = oci_connect('MIVR_19', 'SomePassword_123', 'oti.ru:1521/alfa', 'UTF8');
+    $db = mysqli_connect('localhost', 'root', '', 'stp');
+    mysqli_set_charset($db, 'utf8');
     if (!$db) {
-        $e = oci_error();
+        $e = mysqli_error();
         trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
     }
     $src = null;
@@ -18,24 +19,20 @@
         $id = $_REQUEST["id"]; 
         if ($id == "1") {
             $name = $_REQUEST["name"];
-            $src = oci_parse($db, 'INSERT INTO STP_FILMS VALUES (STP_FILM.nextval, \'' . $name . '\')');
+            $src = mysqli_query($db, 'INSERT INTO STP_FILMS (NAME) VALUES (\'' . $name . '\')');
         } else if ($id == "2") {
            $name = $_REQUEST['name'];
            $fid = $_REQUEST['fid'];
-           $src = oci_parse($db, 'UPDATE STP_FILMS SET NAME = \'' . $name . '\' WHERE ID = ' . $fid);
+           $src = mysqli_query($db, 'UPDATE STP_FILMS SET NAME = \'' . $name . '\' WHERE ID = ' . $fid);
         } else if ($id == "3") {
            $fid = $_REQUEST['fid'];
-           $src = oci_parse($db, 'DELETE FROM STP_FILMS WHERE ID = ' . $fid);
+           $src = mysqli_query($db, 'DELETE FROM STP_FILMS WHERE ID = ' . $fid);
         }
-        oci_execute($src);
     }
-    $src = oci_parse($db, 'SELECT * FROM "STP_FILMS" ORDER BY ID ASC');
-    oci_execute($src);
-    oci_fetch_all($src, $res);
-    
-    $src = oci_parse($db, 'SELECT ID FROM "STP_FILMS" ORDER BY ID ASC');
-    oci_execute($src);
-    oci_fetch_all($src, $ids);
+    $src = mysqli_query($db, 'SELECT * FROM STP_FILMS ORDER BY ID ASC');
+    $res = mysqli_fetch_all($src, MYSQLI_ASSOC);
+    $src = mysqli_query($db, 'SELECT ID FROM STP_FILMS ORDER BY ID ASC');
+    $ids = mysqli_fetch_all($src, MYSQLI_ASSOC);
 ?>
 
     <body>
@@ -43,10 +40,10 @@
         <table border="1" width="500px" style="float:left; margin-left:10px;">
             <tr><th>Номер</th><th>Название</th></tr>
             <?php 
-                for($i = 0; $i < count($res["ID"]); $i++) {
+                for($i = 0; $i < count($res); $i++) {
                     echo "<tr>";
-                        echo "<td>" . $res["ID"][$i] . "</td>";
-                        echo "<td>" . $res["NAME"][$i] . "</td>";
+                        echo "<td>" . $res[$i]["ID"] . "</td>";
+                        echo "<td>" . $res[$i]["NAME"] . "</td>";
                     echo "</tr>";
                 }
             ?>  
@@ -62,8 +59,8 @@
             <span id="hidden2">
                 <select id="sel">
                     <?php 
-                        for ($i = 0; $i < count($ids["ID"]); $i++) {
-                            echo "<option>". $ids["ID"][$i] . "</option>";
+                        for ($i = 0; $i < count($ids); $i++) {
+                            echo "<option>". $ids[$i]["ID"] . "</option>";
                         }
                     ?>
                 </select>
@@ -75,8 +72,8 @@
             <span id="hidden3">
                 <select id="sel1">
                     <?php 
-                        for ($i = 0; $i < count($ids["ID"]); $i++) {
-                            echo "<option>". $ids["ID"][$i] . "</option>";
+                        for ($i = 0; $i < count($ids); $i++) {
+                            echo "<option>". $ids[$i]["ID"] . "</option>";
                         }
                     ?>
                 </select>
