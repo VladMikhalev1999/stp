@@ -36,7 +36,7 @@
 ?>
 
     <body>
-        <h1>Фильмы</h1>
+        <h2>Фильмы</h2>
         <table border="1" width="500px" style="float:left; margin-left:10px;">
             <tr><th>Номер</th><th>Название</th></tr>
             <?php 
