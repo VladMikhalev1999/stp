@@ -15,12 +15,12 @@ function change_to_button(id, _hid, tid = null) {
 }
 
 function append_request(id, tid = null) {
-    if (tid != null) document.location.href = "films.php?id=" + id + "&name=" + document.getElementById(tid).value;
-    else document.location.href = "films.php?id=" + id; 
+    if (tid != null) document.location.href = "index.php?id=" + id + "&name=" + document.getElementById(tid).value;
+    else document.location.href = "index.php?id=" + id; 
 }
 
 function rename(id, tid, sid) {
     let ind = document.getElementById(sid).selectedIndex;
-    if (tid != null) document.location.href = "films.php?id=" + id + "&name=" + document.getElementById(tid).value + "&fid=" + document.getElementById(sid).options[ind].value;
-    else document.location.href = "films.php?id=" + id + "&fid=" + document.getElementById(sid).options[ind].value;
+    if (tid != null) document.location.href = "index.php?id=" + id + "&name=" + document.getElementById(tid).value + "&fid=" + document.getElementById(sid).options[ind].value;
+    else document.location.href = "index.php?id=" + id + "&fid=" + document.getElementById(sid).options[ind].value;
 }
