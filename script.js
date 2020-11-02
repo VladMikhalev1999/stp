@@ -14,18 +14,18 @@ function change_to_button(id, _hid, tid = null) {
     if (tid != null) document.getElementById(tid).value = "";
 }
 
-function append_request(id, tid = null) {
-    if (tid != null) return "get_films.php?id=" + id + "&name=" + document.getElementById(tid).value;
-    return document.location.href = "films.php?id=" + id; 
+function append_request(id, tid = null, fn) {
+    if (tid != null) return fn + "?id=" + id + "&name=" + document.getElementById(tid).value;
+    return fn + "?id=" + id; 
 }
 
-function rename(id, tid, sid) {
+function rename(id, tid, sid, fn) {
     let ind = document.getElementById(sid).selectedIndex;
-    if (tid != null) return "get_films.php?id=" + id + "&name=" + document.getElementById(tid).value + "&fid=" + document.getElementById(sid).options[ind].value;
-    return "get_films.php?id=" + id + "&fid=" + document.getElementById(sid).options[ind].value;
+    if (tid != null) return fn + "?id=" + id + "&name=" + document.getElementById(tid).value + "&fid=" + document.getElementById(sid).options[ind].value;
+    return fn + "?id=" + id + "&fid=" + document.getElementById(sid).options[ind].value;
 }
 
-function ajax(id, tid = null, sid = null) {
+function ajax(id, tid = null, sid = null, fn = "get_films.php") {
     var objXMLHttpRequest = new XMLHttpRequest();
     objXMLHttpRequest.onreadystatechange = function() {
     if(objXMLHttpRequest.readyState === 4) {
@@ -39,8 +39,8 @@ function ajax(id, tid = null, sid = null) {
         }
     }
     }
-    if (sid == null) objXMLHttpRequest.open('GET', append_request(id, tid));
-    else objXMLHttpRequest.open('GET', rename(id, tid, sid));
+    if (sid == null) objXMLHttpRequest.open('GET', append_request(id, tid, fn));
+    else objXMLHttpRequest.open('GET', rename(id, tid, sid, fn));
     objXMLHttpRequest.send();
 }
 
