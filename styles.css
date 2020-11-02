@@ -1,3 +1,6 @@
+body {
+min-width: 1076px;
+}
 tr, td { padding: 5px 10px; text-align: center; }
 #hidden, #hidden2, #hidden3 {
     visibility: hidden;
