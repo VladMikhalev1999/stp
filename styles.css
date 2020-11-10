@@ -1,13 +1,12 @@
 body {
-min-width: 1303px;
+min-width: 1076px;
 }
+
+div.nav {
+    padding: 10px;
+}
+
 tr, td { padding: 5px 10px; text-align: center; }
 #hidden, #hidden2, #hidden3 {
     visibility: hidden;
-}
-button {
-    width: 200px;
-}
-input[type="text"] {
-    width: 200px;
 }
