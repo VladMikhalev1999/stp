@@ -49,13 +49,13 @@
             ?>  
         </table>
         <div style="float: left; margin-left:15px;">
-            <button id="add" onclick="change_to_input_form('add', 'hidden')">Добавить</button>
+            <button id="add" onclick="changeToInputForm('add', 'hidden')">Добавить</button>
             <span id="hidden">
                 <input id="txt" type="text" width="100px" name="name" />
                 <input type="submit" value="Подтвердить" onclick="ajax(1, 'txt')" />
-                <button id="cancel" onclick="change_to_button('add', 'hidden', 'txt')">Отмена</button>
+                <button id="cancel" onclick="changeToButton('add', 'hidden', 'txt')">Отмена</button>
             </span><br /><br />
-            <button id="edit" onclick="change_to_input_form('edit', 'hidden2')">Редактировать</button>
+            <button id="edit" onclick="changeToInputForm('edit', 'hidden2')">Редактировать</button>
             <span id="hidden2">
                 <select id="sel">
                     <?php 
@@ -66,9 +66,9 @@
                 </select>
                 <input id="txt2" type="text" width="100px" name="name" />
                 <input type="submit" value="Подтвердить" onclick="ajax(2, 'txt2', 'sel')"/>
-                <button id="cancel" onclick="change_to_button('edit', 'hidden2', 'txt2')">Отмена</button>
+                <button id="cancel" onclick="changeToButton('edit', 'hidden2', 'txt2')">Отмена</button>
             </span><br /><br />
-            <button id="remove" onclick="change_to_input_form('remove', 'hidden3')">Удалить</button>
+            <button id="remove" onclick="changeToInputForm('remove', 'hidden3')">Удалить</button>
             <span id="hidden3">
                 <select id="sel1">
                     <?php 
@@ -78,7 +78,7 @@
                     ?>
                 </select>
                 <input type="submit" value="Подтвердить" onclick="ajax(3, null, 'sel1')"/>
-                <button id="cancel" onclick="change_to_button('remove', 'hidden3')">Отмена</button>
+                <button id="cancel" onclick="changeToButton('remove', 'hidden3')">Отмена</button>
             </span><br /><br />
         </div>
     </body>
