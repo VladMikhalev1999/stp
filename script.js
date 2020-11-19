@@ -1,11 +1,11 @@
-function change_to_input_form(id, _hid) {
+function changeToInputForm(id, _hid) {
     let add = document.getElementById(id)
     add.style.visibility = "hidden";
     let hid = document.getElementById(_hid)
     hid.style.visibility = "visible";
 }
 
-function change_to_button(id, _hid, tid = null) {
+function changeToButton(id, _hid, tid = null) {
     let add = document.getElementById(id)
     add.style.visibility = "hidden";
     let hid = document.getElementById(_hid)
@@ -14,7 +14,7 @@ function change_to_button(id, _hid, tid = null) {
     if (tid != null) document.getElementById(tid).value = "";
 }
 
-function append_request(id, tid = null, fn) {
+function appendRequest(id, tid = null, fn) {
     if (tid != null) return fn + "?id=" + id + "&name=" + document.getElementById(tid).value;
     return fn + "?id=" + id; 
 }
@@ -31,8 +31,8 @@ function ajax(id, tid = null, sid = null, fn = "get_films.php") {
     if(objXMLHttpRequest.readyState === 4) {
         if(objXMLHttpRequest.status === 200) {
             var table = document.getElementById("tbl_films");
-            update_table(table, objXMLHttpRequest.responseText)
-            update_lists(['sel', 'sel1'], objXMLHttpRequest.responseText)
+            updateTable(table, objXMLHttpRequest.responseText)
+            updateLists(['sel', 'sel1'], objXMLHttpRequest.responseText)
         } else {
             alert('Error Code: ' +  objXMLHttpRequest.status);
             alert('Error Message: ' + objXMLHttpRequest.statusText);
@@ -44,7 +44,7 @@ function ajax(id, tid = null, sid = null, fn = "get_films.php") {
     objXMLHttpRequest.send();
 }
 
-function update_lists(lids, response) {
+function updateLists(lids, response) {
     let data = JSON.parse(response)
     for (let i = 0; i < lids.length; i++) {
         let lid = lids[i]
@@ -60,7 +60,7 @@ function update_lists(lids, response) {
     }
 }
 
-function update_table(table, response) {
+function updateTable(table, response) {
     var x = document.createElement("tbody");
     table.replaceChild(x, table.children[0]);
     var body = table.children[0];
